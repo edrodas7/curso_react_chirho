@@ -1,14 +1,15 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import NavBar from './components/NavBar/NavBar';
+import { CartProvider } from './context/CartProvider';
+import AppRoutes from './routes/AppRoutes';
+import './App.css';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/about" element={<AboutPage />} />
-    </Routes>
+    <CartProvider>
+      <NavBar />
+      <AppRoutes />
+    </CartProvider>
   );
 }
-
 
 export default App;
