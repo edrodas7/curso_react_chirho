@@ -1,41 +1,38 @@
 import { useState } from 'react';
 
-function ItemCount({ stock, initial = 1, onAdd }) {
-  const [quantity, setQuantity] = useState(initial);
-  const hasStock = stock > 0;
+function ItemCount({ stock, onAdd }) {
+  const [cantidad, setCantidad] = useState(1);
 
-  function decrease() {
-    setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1));
-  }
-
-  function increase() {
-    setQuantity((currentQuantity) => Math.min(stock, currentQuantity + 1));
-  }
-
-  function handleSubmit() {
-    if (!hasStock || quantity < 1 || quantity > stock) {
-      return;
+  function restar() {
+    if (cantidad > 1) {
+      setCantidad(cantidad - 1);
     }
-
-    onAdd(quantity);
   }
 
-  if (!hasStock) {
+  function sumar() {
+    if (cantidad < stock) {
+      setCantidad(cantidad + 1);
+    }
+  }
+
+  function agregar() {
+    if (stock > 0 && cantidad >= 1 && cantidad <= stock) {
+      onAdd(cantidad);
+    }
+  }
+
+  if (stock === 0) {
     return <p className="status-message">Producto sin stock.</p>;
   }
 
   return (
     <div className="item-count">
       <div className="counter-controls">
-        <button type="button" onClick={decrease} disabled={quantity <= 1}>
-          -
-        </button>
-        <span>{quantity}</span>
-        <button type="button" onClick={increase} disabled={quantity >= stock}>
-          +
-        </button>
+        <button onClick={restar}>-</button>
+        <span>{cantidad}</span>
+        <button onClick={sumar}>+</button>
       </div>
-      <button className="primary-button" type="button" onClick={handleSubmit}>
+      <button className="primary-button" onClick={agregar}>
         Agregar al carrito
       </button>
       <small>Stock disponible: {stock}</small>
