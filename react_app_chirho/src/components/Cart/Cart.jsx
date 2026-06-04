@@ -1,9 +1,10 @@
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from '../CartItem/CartItem';
-import { useCart } from '../../hooks/useCart';
+import { CartContext } from '../../context/cartContextValue';
 
 function Cart() {
-  const { cart, clearCart, removeItem, totalPrice } = useCart();
+  const { cart, clearCart, removeItem, totalPrice } = useContext(CartContext);
 
   if (cart.length === 0) {
     return (
@@ -29,12 +30,12 @@ function Cart() {
         ))}
       </section>
       <section className="cart-summary">
-        <button className="secondary-button" type="button" onClick={clearCart}>
+        <button className="secondary-button" onClick={clearCart}>
           Vaciar carrito
         </button>
         <div>
           <span>Total</span>
-          <strong>${totalPrice.toLocaleString('es-GT')}</strong>
+          <strong>${totalPrice}</strong>
         </div>
         <Link className="primary-button" to="/checkout">
           Ir al checkout

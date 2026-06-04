@@ -1,31 +1,14 @@
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../hooks/useCart';
+import { CartContext } from '../../context/cartContextValue';
 
 function CartWidget() {
-  const { totalQuantity } = useCart();
+  const { totalQuantity } = useContext(CartContext);
 
   return (
-    <Link className="cart-widget" to="/cart" aria-label="Ver carrito">
-      <svg
-        className="cart-widget-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="24"
-        height="24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="9" cy="21" r="1" />
-        <circle cx="20" cy="21" r="1" />
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-      </svg>
-      {totalQuantity > 0 ? (
-        <strong className="cart-widget-badge">{totalQuantity}</strong>
-      ) : null}
+    <Link className="cart-widget" to="/cart">
+      <span>🛒</span>
+      {totalQuantity > 0 && <strong>{totalQuantity}</strong>}
     </Link>
   );
 }

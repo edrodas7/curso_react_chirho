@@ -1,40 +1,20 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { useCart } from '../../hooks/useCart';
+import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { CartContext } from '../../context/cartContextValue';
 import { createOrder } from '../../services/firestore';
 
-const initialBuyer = {
-  name: '',
-  phone: '',
-  email: '',
-};
-
 function CheckoutForm() {
-  const { cart, clearCart, totalPrice } = useCart();
-  const [buyer, setBuyer] = useState(initialBuyer);
+  const { cart, clearCart, totalPrice } = useContext(CartContext);
+  const [nombre, setNombre] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [email, setEmail] = useState('');
   const [orderId, setOrderId] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
-  if (cart.length === 0 && !orderId) {
-    return <Navigate to="/cart" replace />;
-  }
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setBuyer((currentBuyer) => ({
-      ...currentBuyer,
-      [name]: value,
-    }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setSubmitting(true);
-    setError('');
+  function handleSubmit(e) {
+    e.preventDefault();
 
     const order = {
-      buyer,
+      buyer: { nombre, telefono, email },
       items: cart.map((item) => ({
         id: item.id,
         name: item.name,
@@ -44,16 +24,14 @@ function CheckoutForm() {
       total: totalPrice,
     };
 
-    try {
-      const generatedOrderId = await createOrder(order);
-      setOrderId(generatedOrderId);
-      clearCart();
-      setBuyer(initialBuyer);
-    } catch {
-      setError('No se pudo generar la orden. Intenta nuevamente.');
-    } finally {
-      setSubmitting(false);
-    }
+    createOrder(order)
+      .then((id) => {
+        setOrderId(id);
+        clearCart();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   if (orderId) {
@@ -64,6 +42,18 @@ function CheckoutForm() {
         <strong className="order-id">{orderId}</strong>
         <Link className="primary-button" to="/">
           Volver al catalogo
+        </Link>
+      </main>
+    );
+  }
+
+  if (cart.length === 0) {
+    return (
+      <main className="page empty-state">
+        <h1>Carrito vacio</h1>
+        <p>Agrega productos antes de continuar al checkout.</p>
+        <Link className="primary-button" to="/">
+          Ver catalogo
         </Link>
       </main>
     );
@@ -80,41 +70,35 @@ function CheckoutForm() {
           Nombre
           <input
             type="text"
-            name="name"
-            value={buyer.name}
-            onChange={handleChange}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
             required
-            minLength="3"
           />
         </label>
         <label>
           Telefono
           <input
             type="tel"
-            name="phone"
-            value={buyer.phone}
-            onChange={handleChange}
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
             required
-            minLength="8"
           />
         </label>
         <label>
           Email
           <input
             type="email"
-            name="email"
-            value={buyer.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </label>
-        {error ? <p className="status-message error">{error}</p> : null}
         <div className="checkout-total">
           <span>Total a pagar</span>
-          <strong>${totalPrice.toLocaleString('es-GT')}</strong>
+          <strong>${totalPrice}</strong>
         </div>
-        <button className="primary-button" type="submit" disabled={submitting}>
-          {submitting ? 'Generando orden...' : 'Confirmar compra'}
+        <button className="primary-button" type="submit">
+          Confirmar compra
         </button>
       </form>
     </main>

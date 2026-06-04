@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ItemCount from '../ItemCount/ItemCount';
-import { useCart } from '../../hooks/useCart';
+import { CartContext } from '../../context/cartContextValue';
 
 function ItemDetail({ product }) {
-  const { addItem, isInCart } = useCart();
-  const [added, setAdded] = useState(isInCart(product.id));
+  const { addItem } = useContext(CartContext);
+  const [agregado, setAgregado] = useState(false);
 
-  function handleAdd(quantity) {
-    addItem(product, quantity);
-    setAdded(true);
+  function handleAgregar(cantidad) {
+    addItem(product, cantidad);
+    setAgregado(true);
   }
 
   return (
@@ -19,12 +19,10 @@ function ItemDetail({ product }) {
         <span className="product-category">{product.category}</span>
         <h1>{product.name}</h1>
         <p>{product.description}</p>
-        <strong>${product.price.toLocaleString('es-GT')}</strong>
-        {added ? (
+        <strong>${product.price}</strong>
+        {agregado ? (
           <div className="detail-actions">
-            <p className="status-message success">
-              El producto fue agregado al carrito.
-            </p>
+            <p className="status-message success">Producto agregado al carrito.</p>
             <Link className="primary-button" to="/cart">
               Terminar compra
             </Link>
@@ -33,7 +31,7 @@ function ItemDetail({ product }) {
             </Link>
           </div>
         ) : (
-          <ItemCount stock={product.stock} onAdd={handleAdd} />
+          <ItemCount stock={product.stock} onAdd={handleAgregar} />
         )}
       </div>
     </article>
